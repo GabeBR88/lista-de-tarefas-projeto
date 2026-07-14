@@ -1,7 +1,7 @@
 "use client";
 
-import { BotaoPadrao } from "@/components/button";
-import { InputIcone } from "@/components/input";
+import { BotaoPadrao } from "@/components/Button";
+import { InputIcone } from "@/components/Input";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -58,7 +58,7 @@ export default function CadastroPage() {
               tipo="password"
               placeholder="Digite sua senha"
               icone="bi bi-lock"
-              mostrarOlho 
+              mostrarOlho
               required
             />
 

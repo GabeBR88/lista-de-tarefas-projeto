@@ -1,65 +1,154 @@
+import { Navbar } from "@/components/Navbar";
+import { Footer } from "@/components/Footer";
+import { SecaoTitulo } from "@/components/SecaoTitulo";
+import { CardFuncionalidade } from "@/components/CardFuncionalidade";
+import { CardContato } from "@/components/CardContato";
+import { SobreDesenvolvedor } from "@/components/SobreDesenvolvedor";
 import Image from "next/image";
+import Link from "next/link";
+import type { Metadata } from "next";
 
-export default function Home() {
+export const metadata: Metadata = {
+  title: "Minha Lista de Tarefas",
+};
+
+export default function LandingPage() {
+  const funcionalidades = [
+    {
+      icone: "bi bi-plus-circle",
+      titulo: "Criar Tarefas",
+      descricao: "Adicione novas tarefas rapidamente com apenas um clique.",
+    },
+    {
+      icone: "bi bi-pencil-square",
+      titulo: "Editar",
+      descricao: "Atualize o texto das suas tarefas sempre que precisar.",
+    },
+    {
+      icone: "bi bi-trash",
+      titulo: "Excluir",
+      descricao: "Remova tarefas concluídas ou que não são mais necessárias.",
+    },
+    {
+      icone: "bi bi-check-circle",
+      titulo: "Concluir",
+      descricao: "Marque tarefas como concluídas e acompanhe seu progresso.",
+    },
+  ];
+
+  const contatos = [
+    {
+      icone: "bi bi-envelope",
+      titulo: "Email",
+      texto: "gabrielbrito.contato2017@gmail.com",
+      href: "mailto:gabrielbrito.contato2017@gmail.com",
+    },
+    {
+      icone: "bi bi-github",
+      titulo: "GitHub",
+      texto: "/GabeBR88",
+      href: "https://github.com/GabeBR88",
+      externo: true,
+    },
+    {
+      icone: "bi bi-linkedin",
+      titulo: "LinkedIn",
+      texto: "/Gabriel Brito",
+      href: "https://www.linkedin.com/in/gabriel-brito-de-oliveira-371744121/",
+      externo: true,
+    },
+  ];
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+    <div className="min-h-screen bg-white">
+      <Navbar />
+
+      {/* Hero Section */}
+      <section
+        id="home"
+        className="bg-linear-to-br from-(--color-primary) to-(--color-accent) px-4 py-20 sm:px-6 lg:px-8"
+      >
+        <div className="mx-auto max-w-7xl text-center">
+          <h1 className="mb-6 text-4xl font-bold text-white sm:text-5xl lg:text-6xl">
+            Organize suas tarefas de forma simples e eficiente
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className="mx-auto mb-10 max-w-2xl text-lg text-white/80 sm:text-xl">
+            Uma ferramenta intuitiva para você gerenciar seu dia a dia, aumentar
+            sua produtividade e nunca mais esquecer uma tarefa importante.
           </p>
+          <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
+            <Link
+              href="/cadastro"
+              className="w-full rounded-full bg-white px-8 py-3 text-center font-semibold text-(--color-primary) hover:bg-gray-100 transition-colors sm:w-auto"
+            >
+              Comece agora
+            </Link>
+            <a
+              href="#funcionalidades"
+              className="w-full rounded-full border-2 border-white px-8 py-3 text-center font-semibold text-white hover:bg-white/10 transition-colors sm:w-auto"
+            >
+              Saiba mais
+            </a>
+          </div>
+
+          <div className="mt-16 flex justify-center">
+            <div className="relative h-64 w-full max-w-2xl rounded-2xl bg-white/10 backdrop-blur-sm sm:h-80 lg:h-96">
+              <Image
+                src="/images/fundo.jpg"
+                alt="Dashboard"
+                fill
+                className="object-cover rounded-2xl"
+              />
+            </div>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-39.5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/8 px-5 transition-colors hover:border-transparent hover:bg-black/4 dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-39.5"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      </section>
+
+      {/* Funcionalidades */}
+      <section
+        id="funcionalidades"
+        className="bg-gray-50 px-4 py-20 sm:px-6 lg:px-8"
+      >
+        <div className="mx-auto max-w-7xl">
+          <SecaoTitulo
+            titulo="Funcionalidades"
+            subtitulo="Tudo que você precisa para gerenciar suas tarefas"
+          />
+          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+            {funcionalidades.map((func) => (
+              <CardFuncionalidade key={func.titulo} {...func} />
+            ))}
+          </div>
         </div>
-      </main>
+      </section>
+
+      {/* Sobre o desenvolvedor */}
+      <section id="sobre" className="px-4 py-20 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl">
+          <SecaoTitulo titulo="Sobre o Desenvolvedor" />
+          <SobreDesenvolvedor />
+        </div>
+      </section>
+
+      {/* Contato */}
+      <section id="contato" className="bg-gray-50 px-4 py-20 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl">
+          <SecaoTitulo
+            titulo="Contato"
+            subtitulo="Tem alguma dúvida ou sugestão? Entre em contato!"
+          />
+          <div className="mx-auto max-w-2xl">
+            <div className="grid gap-8 sm:grid-cols-3">
+              {contatos.map((contato) => (
+                <CardContato key={contato.titulo} {...contato} />
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Rodapé */}
+      <Footer />
     </div>
   );
 }

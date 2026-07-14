@@ -1,5 +1,5 @@
-import { BotaoPadrao } from "@/components/button";
-import { InputIcone } from "@/components/input";
+import { BotaoPadrao } from "@/components/Button";
+import { InputIcone } from "@/components/Input";
 import type { Metadata } from "next";
 import Link from "next/link";
 

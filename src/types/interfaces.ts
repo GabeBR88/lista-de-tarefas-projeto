@@ -17,3 +17,25 @@ export interface InputIconeProps {
   mostrarOlho?: boolean;
   onPaste?: (e: React.ClipboardEvent) => void; // ← Novo!
 }
+
+// Interfaces para as propriedades components > SecaoTitulo.tsx
+export interface SecaoTituloProps {
+  titulo: string;
+  subtitulo?: string;
+}
+
+// Interface para as propriedades components > CardFuncionalidade.tsx
+export interface CardFuncionalidadeProps {
+  icone: string;
+  titulo: string;
+  descricao: string;
+}
+
+// Interface para as propriedades components > CardContato.tsx
+export interface CardContatoProps {
+  icone: string;
+  titulo: string;
+  texto: string;
+  href: string;
+  externo?: boolean;
+}

@@ -1,4 +1,9 @@
-import { BotaoPadraoProps } from "@/types/interfaces";
+interface BotaoPadraoProps {
+  icon?: string;
+  texto: string;
+  tipo?: "submit" | "button" | "reset";
+  onClick?: () => void;
+}
 
 export function BotaoPadrao({ icon, texto, tipo, onClick }: BotaoPadraoProps) {
   return (

@@ -6,7 +6,13 @@ export function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
   // Rotas públicas que não exigem autenticação
-  const rotasPublicas = ["/", "/login", "/cadastro", "/recuperar-senha"];
+  const rotasPublicas = [
+    "/",
+    "/login",
+    "/cadastro",
+    "/recuperar-senha",
+    "/dashboard", // RETIRAR DEPOIS DO TESTE, POIS O DASHBOARD É UMA ROTA PRIVADA
+  ];
 
   // Se for rota pública, permite o acesso
   if (rotasPublicas.includes(pathname)) {
@@ -22,7 +28,7 @@ export function proxy(request: NextRequest) {
   return NextResponse.next();
 }
 
-// Rotas que o middleware deve interceptar, exceto as rotas públicas e arquivos estáticos
+// Rotas que o proxy deve interceptar, exceto as rotas públicas e arquivos estáticos
 export const config = {
   matcher: ["/((?!api|_next/static|_next/image|favicon.ico|images).*)"],
 };

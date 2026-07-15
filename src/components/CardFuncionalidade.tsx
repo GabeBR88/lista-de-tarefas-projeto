@@ -1,4 +1,8 @@
-import { CardFuncionalidadeProps } from "@/types/interfaces";
+interface CardFuncionalidadeProps {
+  icone: string;
+  titulo: string;
+  descricao: string;
+}
 
 export function CardFuncionalidade({
   icone,

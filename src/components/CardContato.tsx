@@ -1,5 +1,12 @@
-import { CardContatoProps } from "@/types/interfaces";
 import Link from "next/link";
+
+interface CardContatoProps {
+  icone: string;
+  titulo: string;
+  texto: string;
+  href: string;
+  externo?: boolean;
+}
 
 export function CardContato({
   icone,

@@ -1,7 +1,19 @@
 "use client";
 
-import { InputIconeProps } from "@/types/interfaces";
 import { useState } from "react";
+
+export interface InputIconeProps {
+  texto: string;
+  tipo: "text" | "email" | "password";
+  placeholder: string;
+  icone: string;
+  valor?: string;
+  required?: boolean;
+  mostrarOlho?: boolean;
+  onPaste?: (e: React.ClipboardEvent) => void;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
+}
 
 export function InputIcone({
   texto,
@@ -12,6 +24,8 @@ export function InputIcone({
   required,
   mostrarOlho,
   onPaste,
+  onChange,
+  onKeyDown,
 }: InputIconeProps) {
   const [mostrarSenha, setMostrarSenha] = useState(false);
 
@@ -35,6 +49,8 @@ export function InputIcone({
           required={required}
           value={valor}
           onPaste={onPaste}
+          onChange={onChange}
+          onKeyDown={onKeyDown}
           className="w-full rounded-lg border border-gray-300 py-3 pl-10 pr-10 text-gray-700 transition-colors focus:border-(--color-primary) focus:outline-none focus:ring-2 focus:ring-(--color-primary)/20"
         />
 

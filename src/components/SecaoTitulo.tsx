@@ -1,4 +1,7 @@
-import { SecaoTituloProps } from "@/types/interfaces";
+interface SecaoTituloProps {
+  titulo: string;
+  subtitulo?: string;
+}
 
 export function SecaoTitulo({ titulo, subtitulo }: SecaoTituloProps) {
   return (

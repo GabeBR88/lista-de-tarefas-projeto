@@ -4,8 +4,8 @@ import { SecaoTitulo } from "@/components/SecaoTitulo";
 import { CardFuncionalidade } from "@/components/CardFuncionalidade";
 import { CardContato } from "@/components/CardContato";
 import { SobreDesenvolvedor } from "@/components/SobreDesenvolvedor";
+import { BotaoLink } from "@/components/BotaoLink";
 import Image from "next/image";
-import Link from "next/link";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -77,18 +77,16 @@ export default function LandingPage() {
             sua produtividade e nunca mais esquecer uma tarefa importante.
           </p>
           <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
-            <Link
+            <BotaoLink
+              texto="Comece agora"
               href="/cadastro"
-              className="w-full rounded-full bg-white px-8 py-3 text-center font-semibold text-(--color-primary) hover:bg-gray-100 transition-colors sm:w-auto"
-            >
-              Comece agora
-            </Link>
-            <a
+              variante="preenchido"
+            />
+            <BotaoLink
+              texto="Saiba mais"
               href="#funcionalidades"
-              className="w-full rounded-full border-2 border-white px-8 py-3 text-center font-semibold text-white hover:bg-white/10 transition-colors sm:w-auto"
-            >
-              Saiba mais
-            </a>
+              variante="outline"
+            />
           </div>
 
           <div className="mt-16 flex justify-center">

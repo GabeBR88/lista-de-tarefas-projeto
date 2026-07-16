@@ -2,6 +2,7 @@
 
 import { InputIcone } from "@/components/Input";
 import { BotaoPadrao } from "@/components/Button";
+import { BotaoLink } from "@/components/BotaoLink";
 
 interface CampoAdicionarTarefaProps {
   valor: string;
@@ -32,13 +33,13 @@ export function CampoAdicionarTarefa({
           />
         </div>
         <div className="flex gap-3">
-          <button
-            type="button"
+          <BotaoLink
+            texto="Cancelar"
+            href="#"
+            variante="outlineCinza"
+            className="border-gray-300 text-gray-600 hover:border-gray-400 hover:text-gray-800"
             onClick={onCancelar}
-            className="cursor-pointer rounded-full border-2 border-gray-300 px-6 py-3 font-medium text-gray-600 transition-all hover:border-gray-400 hover:text-gray-800"
-          >
-            Cancelar
-          </button>
+          />
           <BotaoPadrao
             texto="Adicionar"
             icon="bi bi-plus-lg"

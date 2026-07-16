@@ -1,0 +1,72 @@
+import { query } from "@/lib/db";
+import { NextRequest, NextResponse } from "next/server";
+import jwt from "jsonwebtoken";
+
+const JWT_SECRET = process.env.JWT_SECRET || "lista_tarefas_secret_2026";
+
+// Pegar usuário do token
+function getUserIdFromToken(request: NextRequest): number | null {
+  const token = request.cookies.get("token")?.value;
+  if (!token) return null;
+
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET) as { id: number };
+    return decoded.id;
+  } catch {
+    return null;
+  }
+}
+
+// GET - Listar tarefas do usuário
+export async function GET(request: NextRequest) {
+  try {
+    const userId = getUserIdFromToken(request);
+    if (!userId) {
+      return NextResponse.json({ erro: "Não autorizado." }, { status: 401 });
+    }
+
+    const tarefas = await query(
+      "SELECT id, user_id, titulo, concluida, created_at FROM tasks WHERE user_id = ? ORDER BY created_at DESC",
+      [userId],
+    );
+
+    return NextResponse.json(tarefas, { status: 200 });
+  } catch (erro) {
+    console.error("Erro ao listar tarefas:", erro);
+    return NextResponse.json({ erro: "Erro interno." }, { status: 500 });
+  }
+}
+
+// POST - Criar nova tarefa
+export async function POST(request: NextRequest) {
+  try {
+    const userId = getUserIdFromToken(request);
+    if (!userId) {
+      return NextResponse.json({ erro: "Não autorizado." }, { status: 401 });
+    }
+
+    const { titulo } = await request.json();
+
+    if (!titulo || titulo.trim() === "") {
+      return NextResponse.json(
+        { erro: "Título é obrigatório." },
+        { status: 400 },
+      );
+    }
+
+    const resultado = (await query(
+      "INSERT INTO tasks (user_id, titulo) VALUES (?, ?)",
+      [userId, titulo.trim()],
+    )) as { insertId: number };
+
+    const novaTarefa = await query(
+      "SELECT id, user_id, titulo, concluida, created_at FROM tasks WHERE id = ?",
+      [resultado.insertId],
+    );
+
+    return NextResponse.json(novaTarefa, { status: 201 });
+  } catch (erro) {
+    console.error("Erro ao criar tarefa:", erro);
+    return NextResponse.json({ erro: "Erro interno." }, { status: 500 });
+  }
+}

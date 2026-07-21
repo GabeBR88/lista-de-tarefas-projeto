@@ -95,6 +95,7 @@ export default function LandingPage() {
                 src="/images/fundo.jpg"
                 alt="Dashboard"
                 fill
+                priority
                 className="object-cover rounded-2xl"
               />
             </div>

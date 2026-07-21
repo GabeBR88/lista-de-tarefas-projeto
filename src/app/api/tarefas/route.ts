@@ -17,7 +17,7 @@ function getUserIdFromToken(request: NextRequest): number | null {
   }
 }
 
-// GET - Listar tarefas do usuário
+// GET - Listar tarefas com subtarefas
 export async function GET(request: NextRequest) {
   try {
     const userId = getUserIdFromToken(request);
@@ -25,12 +25,29 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ erro: "Não autorizado." }, { status: 401 });
     }
 
-    const tarefas = await query(
+    const tarefas = (await query(
       "SELECT id, user_id, titulo, concluida, created_at FROM tasks WHERE user_id = ? ORDER BY created_at DESC",
       [userId],
+    )) as {
+      id: number;
+      user_id: number;
+      titulo: string;
+      concluida: boolean;
+      created_at: string;
+    }[];
+
+    // Buscar subtarefas para cada tarefa
+    const tarefasComSubtarefas = await Promise.all(
+      tarefas.map(async (tarefa) => {
+        const subtarefas = await query(
+          "SELECT id, task_id, user_id, titulo, concluida, created_at FROM subtasks WHERE task_id = ? ORDER BY created_at ASC",
+          [tarefa.id],
+        );
+        return { ...tarefa, subtarefas };
+      }),
     );
 
-    return NextResponse.json(tarefas, { status: 200 });
+    return NextResponse.json(tarefasComSubtarefas, { status: 200 });
   } catch (erro) {
     console.error("Erro ao listar tarefas:", erro);
     return NextResponse.json({ erro: "Erro interno." }, { status: 500 });

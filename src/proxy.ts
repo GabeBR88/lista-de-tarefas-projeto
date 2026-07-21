@@ -6,13 +6,7 @@ export function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
   // Rotas públicas que não exigem autenticação
-  const rotasPublicas = [
-    "/",
-    "/login",
-    "/cadastro",
-    "/recuperar-senha",
-    "/dashboard", // RETIRAR DEPOIS DO TESTE, POIS O DASHBOARD É UMA ROTA PRIVADA
-  ];
+  const rotasPublicas = ["/", "/login", "/cadastro", "/recuperar-senha"];
 
   // Se for rota pública, permite o acesso
   if (rotasPublicas.includes(pathname)) {

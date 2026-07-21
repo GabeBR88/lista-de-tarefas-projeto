@@ -19,7 +19,6 @@ export async function POST(request: Request) {
   try {
     const { email, senha } = await request.json();
 
-    // Validações
     if (!email || !senha) {
       return NextResponse.json(
         { erro: "E-mail e senha são obrigatórios." },
@@ -27,7 +26,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // Buscar usuário
     const usuarios = await query(
       "SELECT id, nome, sobrenome, email, senha, temp_password, temp_password_expires FROM users WHERE email = ?",
       [email.toLowerCase().trim()],
@@ -42,8 +40,33 @@ export async function POST(request: Request) {
       );
     }
 
-    // Verificar senha
-    const senhaCorreta = await bcrypt.compare(senha, usuario.senha);
+    // Verificar primeiro se é senha temporária
+    let senhaCorreta = false;
+    let precisaResetar = false;
+
+    if (usuario.temp_password) {
+      // Verificar expiração
+      if (usuario.temp_password_expires) {
+        const expiracao = new Date(usuario.temp_password_expires);
+        if (new Date() > expiracao) {
+          return NextResponse.json(
+            { erro: "Senha temporária expirada. Solicite uma nova." },
+            { status: 401 },
+          );
+        }
+      }
+
+      // Verificar se a senha digitada é a temporária
+      senhaCorreta = await bcrypt.compare(senha, usuario.temp_password);
+      if (senhaCorreta) {
+        precisaResetar = true;
+      }
+    }
+
+    // Se não for a temporária, verificar senha normal
+    if (!senhaCorreta) {
+      senhaCorreta = await bcrypt.compare(senha, usuario.senha);
+    }
 
     if (!senhaCorreta) {
       return NextResponse.json(
@@ -64,7 +87,6 @@ export async function POST(request: Request) {
       { expiresIn: "24h" },
     );
 
-    // Criar resposta
     const resposta = NextResponse.json(
       {
         mensagem: "Login realizado com sucesso!",
@@ -74,19 +96,17 @@ export async function POST(request: Request) {
           sobrenome: usuario.sobrenome,
           email: usuario.email,
         },
-        // Se for senha temporária, avisar frontend
-        precisaResetar: usuario.temp_password ? true : false,
+        precisaResetar,
       },
       { status: 200 },
     );
 
-    // Definir cookie com o token
     resposta.cookies.set("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       path: "/",
-      maxAge: 60 * 60 * 24, // 24 horas
+      maxAge: 60 * 60 * 24,
     });
 
     return resposta;

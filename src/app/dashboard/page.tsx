@@ -7,7 +7,11 @@ import { ListaVazia } from "@/components/ListaVazia";
 import { TarefaColuna } from "@/components/TarefaColuna";
 import { Footer } from "@/components/Footer";
 import { useRouter } from "next/navigation";
-import type { Tarefa, TarefaBackend } from "@/types/interfaces";
+import type {
+  Tarefa,
+  TarefaBackend,
+  SubtarefaBackend,
+} from "@/types/interfaces";
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -18,6 +22,16 @@ export default function DashboardPage() {
   const [mensagemLimite, setMensagemLimite] = useState(false);
   const [carregando, setCarregando] = useState(true);
   const [nomeUsuario, setNomeUsuario] = useState("");
+
+  // Subtarefas
+  const [adicionandoSubtarefaEm, setAdicionandoSubtarefaEm] = useState<
+    number | null
+  >(null);
+  const [novaSubtarefaTexto, setNovaSubtarefaTexto] = useState("");
+  const [editandoSubtarefaId, setEditandoSubtarefaId] = useState<number | null>(
+    null,
+  );
+  const [textoEdicaoSubtarefa, setTextoEdicaoSubtarefa] = useState("");
 
   const LIMITE_TAREFAS = 20;
 
@@ -37,9 +51,23 @@ export default function DashboardPage() {
         ? dados.map((t: TarefaBackend) => ({
             id: Number(t.id),
             user_id: Number(t.user_id),
-            titulo: String(t.titulo || ""),
+            titulo: String(t.titulo ?? ""),
             concluida: Boolean(t.concluida),
-            created_at: new Date(String(t.created_at)).toLocaleString("pt-BR"),
+            created_at: new Date(
+              String(t.created_at ?? new Date()),
+            ).toLocaleString("pt-BR"),
+            subtarefas: Array.isArray(t.subtarefas)
+              ? t.subtarefas.map((s: SubtarefaBackend) => ({
+                  id: Number(s.id),
+                  task_id: Number(s.task_id),
+                  user_id: Number(s.user_id),
+                  titulo: String(s.titulo ?? ""),
+                  concluida: Boolean(s.concluida),
+                  created_at: new Date(
+                    String(s.created_at ?? new Date()),
+                  ).toLocaleString("pt-BR"),
+                }))
+              : [],
           }))
         : [];
 
@@ -69,11 +97,11 @@ export default function DashboardPage() {
       await carregarTarefas();
       await carregarUsuario();
     };
-
     void inicializar();
   }, [carregarTarefas, carregarUsuario]);
 
-  // Adicionar tarefa
+  // ==================== TAREFAS ====================
+
   const adicionarTarefa = async () => {
     if (novaTarefa.trim() === "") return;
 
@@ -106,6 +134,7 @@ export default function DashboardPage() {
         created_at: new Date(String(novaTarefaBanco.created_at)).toLocaleString(
           "pt-BR",
         ),
+        subtarefas: [],
       };
 
       setTarefas([tarefaFormatada, ...tarefas]);
@@ -115,14 +144,16 @@ export default function DashboardPage() {
     }
   };
 
-  // Cancelar
   const cancelar = () => {
     setNovaTarefa("");
     setEditandoId(null);
     setTextoEdicao("");
+    setAdicionandoSubtarefaEm(null);
+    setNovaSubtarefaTexto("");
+    setEditandoSubtarefaId(null);
+    setTextoEdicaoSubtarefa("");
   };
 
-  // Alternar concluída
   const toggleConcluida = async (id: number) => {
     const tarefa = tarefas.find((t) => t.id === id);
     if (!tarefa) return;
@@ -146,13 +177,11 @@ export default function DashboardPage() {
     }
   };
 
-  // Iniciar edição
   const iniciarEdicao = (id: number, titulo: string) => {
     setEditandoId(id);
     setTextoEdicao(titulo);
   };
 
-  // Salvar edição
   const salvarEdicao = async (id: number) => {
     if (textoEdicao.trim() === "") return;
 
@@ -179,20 +208,164 @@ export default function DashboardPage() {
     }
   };
 
-  // Excluir tarefa
   const excluirTarefa = async (id: number) => {
     const tarefasAntigas = [...tarefas];
-
     setTarefas(tarefas.filter((t) => t.id !== id));
 
     try {
-      await fetch(`/api/tarefas/${id}`, {
-        method: "DELETE",
-      });
+      await fetch(`/api/tarefas/${id}`, { method: "DELETE" });
     } catch {
       setTarefas(tarefasAntigas);
     }
   };
+
+  // ==================== SUBTAREFAS ====================
+
+  const toggleAdicionarSubtarefa = (taskId: number) => {
+    setAdicionandoSubtarefaEm(
+      adicionandoSubtarefaEm === taskId ? null : taskId,
+    );
+    setNovaSubtarefaTexto("");
+  };
+
+  const adicionarSubtarefa = async (taskId: number) => {
+    if (novaSubtarefaTexto.trim() === "") return;
+
+    try {
+      const resposta = await fetch("/api/subtarefas", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          task_id: taskId,
+          titulo: novaSubtarefaTexto.trim(),
+        }),
+      });
+
+      if (!resposta.ok) return;
+
+      const dados = await resposta.json();
+      const novaSub = Array.isArray(dados) ? dados[0] : dados;
+
+      setTarefas(
+        tarefas.map((t) =>
+          t.id === taskId
+            ? {
+                ...t,
+                subtarefas: [
+                  ...(t.subtarefas || []),
+                  {
+                    id: Number(novaSub.id),
+                    task_id: Number(novaSub.task_id),
+                    user_id: Number(novaSub.user_id),
+                    titulo: String(novaSub.titulo),
+                    concluida: Boolean(novaSub.concluida),
+                    created_at: new Date(
+                      String(novaSub.created_at),
+                    ).toLocaleString("pt-BR"),
+                  },
+                ],
+              }
+            : t,
+        ),
+      );
+
+      setNovaSubtarefaTexto("");
+      setAdicionandoSubtarefaEm(null);
+    } catch {
+      console.error("Erro ao adicionar subtarefa");
+    }
+  };
+
+  const toggleConcluidaSubtarefa = async (subId: number) => {
+    const tarefa = tarefas.find((t) =>
+      t.subtarefas?.some((s) => s.id === subId),
+    );
+    if (!tarefa) return;
+    const subtarefa = tarefa.subtarefas?.find((s) => s.id === subId);
+    if (!subtarefa) return;
+
+    setTarefas(
+      tarefas.map((t) =>
+        t.id === tarefa.id
+          ? {
+              ...t,
+              subtarefas: t.subtarefas?.map((s) =>
+                s.id === subId ? { ...s, concluida: !s.concluida } : s,
+              ),
+            }
+          : t,
+      ),
+    );
+
+    try {
+      await fetch(`/api/subtarefas/${subId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ concluida: !subtarefa.concluida }),
+      });
+    } catch {
+      carregarTarefas();
+    }
+  };
+
+  const editarSubtarefa = (subId: number, tituloAtual: string) => {
+    setEditandoSubtarefaId(subId);
+    setTextoEdicaoSubtarefa(tituloAtual);
+  };
+
+  const salvarSubtarefa = async (subId: number) => {
+    if (textoEdicaoSubtarefa.trim() === "") return;
+
+    setTarefas(
+      tarefas.map((t) => ({
+        ...t,
+        subtarefas: t.subtarefas?.map((s) =>
+          s.id === subId ? { ...s, titulo: textoEdicaoSubtarefa.trim() } : s,
+        ),
+      })),
+    );
+
+    setEditandoSubtarefaId(null);
+    setTextoEdicaoSubtarefa("");
+
+    try {
+      await fetch(`/api/subtarefas/${subId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ titulo: textoEdicaoSubtarefa.trim() }),
+      });
+    } catch {
+      carregarTarefas();
+    }
+  };
+
+  const excluirSubtarefa = async (subId: number) => {
+    const tarefa = tarefas.find((t) =>
+      t.subtarefas?.some((s) => s.id === subId),
+    );
+    if (!tarefa) return;
+    const subtarefasAntigas = [...(tarefa.subtarefas || [])];
+
+    setTarefas(
+      tarefas.map((t) =>
+        t.id === tarefa.id
+          ? { ...t, subtarefas: t.subtarefas?.filter((s) => s.id !== subId) }
+          : t,
+      ),
+    );
+
+    try {
+      await fetch(`/api/subtarefas/${subId}`, { method: "DELETE" });
+    } catch {
+      setTarefas(
+        tarefas.map((t) =>
+          t.id === tarefa.id ? { ...t, subtarefas: subtarefasAntigas } : t,
+        ),
+      );
+    }
+  };
+
+  // ==================== RENDER ====================
 
   const limitePorColuna = 10;
   const precisaDuasColunas = tarefas.length > limitePorColuna;
@@ -258,6 +431,19 @@ export default function DashboardPage() {
                 onEdit={iniciarEdicao}
                 onSave={salvarEdicao}
                 onDelete={excluirTarefa}
+                adicionandoSubtarefaEm={adicionandoSubtarefaEm}
+                novaSubtarefaTexto={novaSubtarefaTexto}
+                editandoSubtarefaId={editandoSubtarefaId}
+                textoEdicaoSubtarefa={textoEdicaoSubtarefa}
+                onToggleAdicionarSubtarefa={toggleAdicionarSubtarefa}
+                onAdicionarSubtarefa={adicionarSubtarefa}
+                onCancelarSubtarefa={cancelar}
+                onNovaSubtarefaChange={setNovaSubtarefaTexto}
+                onToggleSubtarefa={toggleConcluidaSubtarefa}
+                onEditSubtarefa={editarSubtarefa}
+                onSaveSubtarefa={salvarSubtarefa}
+                onDeleteSubtarefa={excluirSubtarefa}
+                onTextoEdicaoSubtarefaChange={setTextoEdicaoSubtarefa}
               />
               <TarefaColuna
                 tarefas={colunaDireita}
@@ -268,6 +454,19 @@ export default function DashboardPage() {
                 onEdit={iniciarEdicao}
                 onSave={salvarEdicao}
                 onDelete={excluirTarefa}
+                adicionandoSubtarefaEm={adicionandoSubtarefaEm}
+                novaSubtarefaTexto={novaSubtarefaTexto}
+                editandoSubtarefaId={editandoSubtarefaId}
+                textoEdicaoSubtarefa={textoEdicaoSubtarefa}
+                onToggleAdicionarSubtarefa={toggleAdicionarSubtarefa}
+                onAdicionarSubtarefa={adicionarSubtarefa}
+                onCancelarSubtarefa={cancelar}
+                onNovaSubtarefaChange={setNovaSubtarefaTexto}
+                onToggleSubtarefa={toggleConcluidaSubtarefa}
+                onEditSubtarefa={editarSubtarefa}
+                onSaveSubtarefa={salvarSubtarefa}
+                onDeleteSubtarefa={excluirSubtarefa}
+                onTextoEdicaoSubtarefaChange={setTextoEdicaoSubtarefa}
               />
             </div>
           ) : (
@@ -280,6 +479,19 @@ export default function DashboardPage() {
               onEdit={iniciarEdicao}
               onSave={salvarEdicao}
               onDelete={excluirTarefa}
+              adicionandoSubtarefaEm={adicionandoSubtarefaEm}
+              novaSubtarefaTexto={novaSubtarefaTexto}
+              editandoSubtarefaId={editandoSubtarefaId}
+              textoEdicaoSubtarefa={textoEdicaoSubtarefa}
+              onToggleAdicionarSubtarefa={toggleAdicionarSubtarefa}
+              onAdicionarSubtarefa={adicionarSubtarefa}
+              onCancelarSubtarefa={cancelar}
+              onNovaSubtarefaChange={setNovaSubtarefaTexto}
+              onToggleSubtarefa={toggleConcluidaSubtarefa}
+              onEditSubtarefa={editarSubtarefa}
+              onSaveSubtarefa={salvarSubtarefa}
+              onDeleteSubtarefa={excluirSubtarefa}
+              onTextoEdicaoSubtarefaChange={setTextoEdicaoSubtarefa}
             />
           )}
         </div>

@@ -9,6 +9,7 @@ export function SobreDesenvolvedor() {
           src="/images/minha-foto.jpeg"
           alt="Gabriel Brito"
           fill
+          sizes="(max-width: 768px) 100vw, 300px"
           className="object-cover"
         />
       </div>

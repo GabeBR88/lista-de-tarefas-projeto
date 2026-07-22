@@ -1,8 +1,6 @@
 import { query } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
-
-const JWT_SECRET = process.env.JWT_SECRET || "lista_tarefas_secret_2026";
+import { verifyJwt } from "@/lib/auth";
 
 export async function GET(request: NextRequest) {
   try {
@@ -11,7 +9,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ erro: "Não autorizado." }, { status: 401 });
     }
 
-    const decoded = jwt.verify(token, JWT_SECRET) as { id: number };
+    const decoded = verifyJwt(token) as { id: number };
 
     const usuarios = await query(
       "SELECT id, nome, sobrenome, email FROM users WHERE id = ?",

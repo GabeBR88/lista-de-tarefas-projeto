@@ -1,9 +1,7 @@
 import { query } from "@/lib/db";
 import bcrypt from "bcryptjs";
 import { NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
-
-const JWT_SECRET = process.env.JWT_SECRET || "lista_tarefas_secret_2026";
+import { signJwt } from "@/lib/auth";
 
 type User = {
   id: number;
@@ -76,16 +74,12 @@ export async function POST(request: Request) {
     }
 
     // Gerar token JWT
-    const token = jwt.sign(
-      {
-        id: usuario.id,
-        nome: usuario.nome,
-        sobrenome: usuario.sobrenome,
-        email: usuario.email,
-      },
-      JWT_SECRET,
-      { expiresIn: "24h" },
-    );
+    const token = signJwt({
+      id: usuario.id,
+      nome: usuario.nome,
+      sobrenome: usuario.sobrenome,
+      email: usuario.email,
+    });
 
     const resposta = NextResponse.json(
       {

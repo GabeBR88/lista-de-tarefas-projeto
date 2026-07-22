@@ -1,21 +1,6 @@
 import { query } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
-
-const JWT_SECRET = process.env.JWT_SECRET || "lista_tarefas_secret_2026";
-
-// Pegar usuário do token
-function getUserIdFromToken(request: NextRequest): number | null {
-  const token = request.cookies.get("token")?.value;
-  if (!token) return null;
-
-  try {
-    const decoded = jwt.verify(token, JWT_SECRET) as { id: number };
-    return decoded.id;
-  } catch {
-    return null;
-  }
-}
+import { getUserIdFromToken } from "@/lib/auth";
 
 // GET - Listar tarefas com subtarefas
 export async function GET(request: NextRequest) {

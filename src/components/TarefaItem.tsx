@@ -78,12 +78,12 @@ export function TarefaItem({
         {temSubtarefas && (
           <button
             onClick={() => setExpandido(!expandido)}
-            className="shrink-0 text-gray-400 hover:text-gray-600 cursor-pointer transition-transform"
+            className="shrink-0 text-gray-400 hover:text-gray-600 cursor-pointer"
             title={expandido ? "Recolher subtarefas" : "Expandir subtarefas"}
           >
             <i
-              className={`bi bi-chevron-down text-sm transition-transform duration-200 ${
-                expandido ? "" : "-rotate-90"
+              className={`bi bi-chevron-down text-sm transition-transform duration-200 inline-block ${
+                expandido ? "rotate-180" : ""
               }`}
             ></i>
           </button>

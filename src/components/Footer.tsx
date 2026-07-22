@@ -6,8 +6,9 @@ export function Footer() {
           © 2026 Gabriel Brito. Todos os direitos reservados.
         </p>
         <p className="mt-2 text-gray-500 text-xs">
-          Desenvolvido com dedicação usando Next.js, TypeScript e MySQL
+          Desenvolvido usando Next.js, TypeScript e MySQL
         </p>
+        <p className="mt-1 text-gray-600 text-xs">v1.0.0</p>
       </div>
     </footer>
   );

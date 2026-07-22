@@ -15,7 +15,7 @@ export async function POST(request: Request) {
     }
 
     // Validar nome e sobrenome (mínimo 2 caracteres)
-    if (nome.trim().lenght < 2 || sobrenome.trim().lenght < 2) {
+    if (nome.trim().length < 2 || sobrenome.trim().length < 2) {
       return NextResponse.json(
         { erro: "Nome e sobrenome devem ter pelo menos 2 caracteres." },
         { status: 400 },
@@ -26,8 +26,18 @@ export async function POST(request: Request) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       return NextResponse.json(
+        { erro: "Formato de e-mail inválido." },
+        { status: 400 },
+      );
+    }
+
+    // Validar senha
+    const senhaRegex = /^(?=.*[!@#$%^&*(),.?":{}|<>]).{6,10}$/;
+    if (!senhaRegex.test(senha)) {
+      return NextResponse.json(
         {
-          erro: "A senha deve ter entre 6 a 10 caracteres e conter pelo menos um caractere especial.",
+          erro:
+            "A senha deve ter entre 6 e 10 caracteres e conter pelo menos um caractere especial.",
         },
         { status: 400 },
       );

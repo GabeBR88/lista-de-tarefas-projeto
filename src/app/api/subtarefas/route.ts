@@ -1,19 +1,7 @@
 import { query } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
+import { getUserIdFromToken } from "@/lib/auth";
 
-const JWT_SECRET = process.env.JWT_SECRET || "lista_tarefas_secret_2026";
-
-function getUserIdFromToken(request: NextRequest): number | null {
-  const token = request.cookies.get("token")?.value;
-  if (!token) return null;
-  try {
-    const decoded = jwt.verify(token, JWT_SECRET) as { id: number };
-    return decoded.id;
-  } catch {
-    return null;
-  }
-}
 
 // POST - Criar subtarefa
 export async function POST(request: NextRequest) {

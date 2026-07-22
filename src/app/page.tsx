@@ -90,13 +90,13 @@ export default function LandingPage() {
           </div>
 
           <div className="mt-16 flex justify-center">
-            <div className="relative h-64 w-full max-w-2xl rounded-2xl bg-white/10 backdrop-blur-sm sm:h-80 lg:h-96">
+            <div className="relative h-64 w-auto max-w-2xl sm:h-80 lg:h-96 aspect-3/2">
               <Image
-                src="/images/fundo.jpg"
+                src="/images/fundo.png"
                 alt="Dashboard"
                 fill
                 priority
-                className="object-cover rounded-2xl"
+                className="object-contain rounded-2xl"
               />
             </div>
           </div>
